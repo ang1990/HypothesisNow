@@ -1,0 +1,172 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'AddGroup.ui'
+#
+# Created: Thu Oct  2 19:23:02 2014
+#      by: PyQt4 UI code generator 4.11.1
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt4 import QtCore, QtGui
+
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
+
+class Ui_AddGroup(object):
+    def setupUi(self, AddGroup):
+        AddGroup.setObjectName(_fromUtf8("AddGroup"))
+        AddGroup.resize(400, 300)
+        self.verticalLayoutWidget = QtGui.QWidget(AddGroup)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(-1, -1, 401, 301))
+        self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
+        self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout.setMargin(0)
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.horizontalLayout_4 = QtGui.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+        self.nameLabel = QtGui.QLabel(self.verticalLayoutWidget)
+        self.nameLabel.setObjectName(_fromUtf8("nameLabel"))
+        self.horizontalLayout_4.addWidget(self.nameLabel)
+        self.nameEdit = QtGui.QLineEdit(self.verticalLayoutWidget)
+        self.nameEdit.setObjectName(_fromUtf8("nameEdit"))
+        self.horizontalLayout_4.addWidget(self.nameEdit)
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.colLabel = QtGui.QLabel(self.verticalLayoutWidget)
+        self.colLabel.setObjectName(_fromUtf8("colLabel"))
+        self.horizontalLayout.addWidget(self.colLabel)
+        self.colCombo = QtGui.QComboBox(self.verticalLayoutWidget)
+        self.colCombo.setObjectName(_fromUtf8("colCombo"))
+        self.horizontalLayout.addWidget(self.colCombo)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem1)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.horizontalLayout_3 = QtGui.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
+        self.typeLabel = QtGui.QLabel(self.verticalLayoutWidget)
+        self.typeLabel.setObjectName(_fromUtf8("typeLabel"))
+        self.horizontalLayout_3.addWidget(self.typeLabel)
+        self.typeDisplay = QtGui.QLabel(self.verticalLayoutWidget)
+        self.typeDisplay.setObjectName(_fromUtf8("typeDisplay"))
+        self.horizontalLayout_3.addWidget(self.typeDisplay)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem2)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.stackedWidget = QtGui.QStackedWidget(self.verticalLayoutWidget)
+        self.stackedWidget.setObjectName(_fromUtf8("stackedWidget"))
+        self.textPage = QtGui.QWidget()
+        self.textPage.setObjectName(_fromUtf8("textPage"))
+        self.verticalLayoutWidget_2 = QtGui.QWidget(self.textPage)
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(-1, 9, 391, 141))
+        self.verticalLayoutWidget_2.setObjectName(_fromUtf8("verticalLayoutWidget_2"))
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.verticalLayoutWidget_2)
+        self.verticalLayout_2.setMargin(0)
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.selectorLabel = QtGui.QLabel(self.verticalLayoutWidget_2)
+        self.selectorLabel.setObjectName(_fromUtf8("selectorLabel"))
+        self.verticalLayout_2.addWidget(self.selectorLabel)
+        self.elementSelector = QtGui.QListWidget(self.verticalLayoutWidget_2)
+        self.elementSelector.setObjectName(_fromUtf8("elementSelector"))
+        item = QtGui.QListWidgetItem()
+        self.elementSelector.addItem(item)
+        item = QtGui.QListWidgetItem()
+        self.elementSelector.addItem(item)
+        self.verticalLayout_2.addWidget(self.elementSelector)
+        self.stackedWidget.addWidget(self.textPage)
+        self.numericPage = QtGui.QWidget()
+        self.numericPage.setObjectName(_fromUtf8("numericPage"))
+        self.verticalLayoutWidget_3 = QtGui.QWidget(self.numericPage)
+        self.verticalLayoutWidget_3.setGeometry(QtCore.QRect(-1, 9, 391, 141))
+        self.verticalLayoutWidget_3.setObjectName(_fromUtf8("verticalLayoutWidget_3"))
+        self.verticalLayout_3 = QtGui.QVBoxLayout(self.verticalLayoutWidget_3)
+        self.verticalLayout_3.setMargin(0)
+        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
+        self.line = QtGui.QFrame(self.verticalLayoutWidget_3)
+        self.line.setFrameShape(QtGui.QFrame.HLine)
+        self.line.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line.setObjectName(_fromUtf8("line"))
+        self.verticalLayout_3.addWidget(self.line)
+        self.groupRangeTopLabel = QtGui.QLabel(self.verticalLayoutWidget_3)
+        self.groupRangeTopLabel.setObjectName(_fromUtf8("groupRangeTopLabel"))
+        self.verticalLayout_3.addWidget(self.groupRangeTopLabel)
+        self.horizontalLayout_7 = QtGui.QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(_fromUtf8("horizontalLayout_7"))
+        self.checkBox = QtGui.QCheckBox(self.verticalLayoutWidget_3)
+        self.checkBox.setObjectName(_fromUtf8("checkBox"))
+        self.horizontalLayout_7.addWidget(self.checkBox)
+        self.lessThanEdit = QtGui.QLineEdit(self.verticalLayoutWidget_3)
+        self.lessThanEdit.setObjectName(_fromUtf8("lessThanEdit"))
+        self.horizontalLayout_7.addWidget(self.lessThanEdit)
+        self.lessThanEquals = QtGui.QCheckBox(self.verticalLayoutWidget_3)
+        self.lessThanEquals.setObjectName(_fromUtf8("lessThanEquals"))
+        self.horizontalLayout_7.addWidget(self.lessThanEquals)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_7)
+        self.horizontalLayout_8 = QtGui.QHBoxLayout()
+        self.horizontalLayout_8.setObjectName(_fromUtf8("horizontalLayout_8"))
+        self.checkBox_2 = QtGui.QCheckBox(self.verticalLayoutWidget_3)
+        self.checkBox_2.setObjectName(_fromUtf8("checkBox_2"))
+        self.horizontalLayout_8.addWidget(self.checkBox_2)
+        self.moreThanEdit = QtGui.QLineEdit(self.verticalLayoutWidget_3)
+        self.moreThanEdit.setObjectName(_fromUtf8("moreThanEdit"))
+        self.horizontalLayout_8.addWidget(self.moreThanEdit)
+        self.moreThanEquals = QtGui.QCheckBox(self.verticalLayoutWidget_3)
+        self.moreThanEquals.setObjectName(_fromUtf8("moreThanEquals"))
+        self.horizontalLayout_8.addWidget(self.moreThanEquals)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_8)
+        self.stackedWidget.addWidget(self.numericPage)
+        self.verticalLayout.addWidget(self.stackedWidget)
+        self.dialogButtons = QtGui.QDialogButtonBox(self.verticalLayoutWidget)
+        self.dialogButtons.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.dialogButtons.setObjectName(_fromUtf8("dialogButtons"))
+        self.verticalLayout.addWidget(self.dialogButtons)
+
+        self.retranslateUi(AddGroup)
+        self.stackedWidget.setCurrentIndex(1)
+        QtCore.QObject.connect(self.checkBox, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.lessThanEdit.setEnabled)
+        QtCore.QObject.connect(self.checkBox_2, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.moreThanEdit.setEnabled)
+        QtCore.QMetaObject.connectSlotsByName(AddGroup)
+
+    def retranslateUi(self, AddGroup):
+        AddGroup.setWindowTitle(_translate("AddGroup", "Form", None))
+        self.nameLabel.setText(_translate("AddGroup", "Group Name", None))
+        self.colLabel.setText(_translate("AddGroup", "Column", None))
+        self.typeLabel.setText(_translate("AddGroup", "Datatype of column is:", None))
+        self.typeDisplay.setText(_translate("AddGroup", "Numeric", None))
+        self.selectorLabel.setText(_translate("AddGroup", "Elements Included in Group:", None))
+        __sortingEnabled = self.elementSelector.isSortingEnabled()
+        self.elementSelector.setSortingEnabled(False)
+        item = self.elementSelector.item(0)
+        item.setText(_translate("AddGroup", "M", None))
+        item = self.elementSelector.item(1)
+        item.setText(_translate("AddGroup", "F", None))
+        self.elementSelector.setSortingEnabled(__sortingEnabled)
+        self.groupRangeTopLabel.setText(_translate("AddGroup", "Group Range:", None))
+        self.checkBox.setText(_translate("AddGroup", "Less Than:", None))
+        self.lessThanEquals.setText(_translate("AddGroup", "Inclusive", None))
+        self.checkBox_2.setText(_translate("AddGroup", "More Than:", None))
+        self.moreThanEquals.setText(_translate("AddGroup", "Inclusive", None))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    AddGroup = QtGui.QWidget()
+    ui = Ui_AddGroup()
+    ui.setupUi(AddGroup)
+    AddGroup.show()
+    sys.exit(app.exec_())
+
