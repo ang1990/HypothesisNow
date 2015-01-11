@@ -2,12 +2,14 @@
 
 # Form implementation generated from reading ui file 'StatementBuilder.ui'
 #
-# Created: Tue Oct 28 10:48:42 2014
+# Created: Wed Oct  1 15:45:12 2014
 #      by: PyQt4 UI code generator 4.11.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import Typedef
+import StatementGroupings
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -23,7 +25,82 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Form(object):
+def callBuilder(dataManager, testType, stmt = None):
+    widget = Ui_Form(dataManager)
+    widget.setup(testType, stmt)
+    if widget.exec_():
+        stmt = widget.getTestStatement()
+        return stmt
+    else:
+        return None
+
+class Ui_Form(QtGui.QDialog):
+    
+    dataManager = None
+    g1 = []
+    g2 = []
+    testType = 0
+    oldZComp = 0
+    oldTComp = 0
+    tCol = 0
+    
+    def __init__(self, dataManager, parent = None):
+        super(Ui_Form, self).__init__()
+        self.dataManager = dataManager
+        self.setupUi(self)
+        self.setupCombos()
+        self.loaded = False
+    
+    def setWidget(self, testType):
+        self.testType = testType
+        self.stackedWidget.setCurrentIndex(testType)
+    
+    def setup(self, testType, stmt = None):
+        self.setWidget(testType)
+        if stmt is not None:
+            self.setupStmt(stmt)
+        self.loaded = True
+    
+    def setupCombos(self):
+        self.setupColumnCombo(self.ZCompareCombo)
+        self.setupColumnCombo(self.TCompareCombo)
+        self.setupColumnCombo(self.DepBeforeCombo)
+        self.setupColumnCombo(self.DepAfterCombo)
+        self.setupColumnCombo(self.sqColCombo)
+        
+    def setupColumnCombo(self, combo):
+        for i in range(self.dataManager.getNumColumns()):
+            combo.addItem(self.dataManager.getColumnNameOfIndex(i))
+    
+    
+    #TODO:
+    # Gotta rebuild the statements.
+    
+    def setupStmt(self, stmt):
+        if self.testType == Typedef.TTest:
+            self.g1, self.g2, tCol, eRange = stmt.getTTest()
+            self.TCompareCombo.setCurrentIndex(tCol)
+            self.TERangeCombo.setCurrentIndex(eRange)
+            self.updateListPrint(self.TCol1Display, self.g1)
+            self.updateListPrint(self.TCol2Display, self.g2)
+        elif self.testType == Typedef.ZTest:
+            self.g1, zComp, zMean, zVar, eRange = stmt.getZTest()
+            self.ZMeanEdit.setText(str(zMean))
+            self.ZVarianceEdit.setText(str(zVar))
+            self.ZCompareCombo.setCurrentIndex(zComp)
+            self.ZERangeCombo.setCurrentIndex(eRange)
+            self.updateListPrint(self.ZSampleDisplay, self.g1)
+        elif self.testType == Typedef.DepTest:
+            before, after, self.g1, eRange = stmt.getDepTest()
+            self.DepBeforeCombo.setCurrentIndex(before)
+            self.DepAfterCombo.setCurrentIndex(after)
+            self.updateListPrint(self.DepGroupDisplay, self.g1)
+        elif self.testType == Typedef.ChiSqTest:
+            sqCol, self.g1 = stmt.getChiSqTest()
+            self.sqColCombo.setCurrentIndex(sqCol)
+            self.updateListPrint(self.sqGroupDisplay, self.g1)
+        return
+    
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(368, 465)
@@ -309,9 +386,66 @@ class Ui_Form(object):
         self.dialogButtons.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.dialogButtons.setObjectName(_fromUtf8("dialogButtons"))
 
+        QtCore.QObject.connect(self.dialogButtons, QtCore.SIGNAL(_fromUtf8("accepted()")), Form.accept)
+        QtCore.QObject.connect(self.dialogButtons, QtCore.SIGNAL(_fromUtf8("rejected()")), Form.reject)
+
+        #Signals for group combo boxes.
+        self.TCol1Button.clicked.connect(self.callStatementGroupings)
+        self.TCol2Button.clicked.connect(self.callStatementGroupings)
+        self.ZSampleButton.clicked.connect(self.callStatementGroupings)
+        self.DepGroupButton.clicked.connect(self.callStatementGroupings)
+        self.sqGroupButton.clicked.connect(self.callStatementGroupings)
+
         self.retranslateUi(Form)
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Form)
+        
+        # Currently this does not behave as expected.
+        
+#        self.ZCompareCombo.currentIndexChanged.connect(self.verifyCompareZ)
+#        self.TCompareCombo.currentIndexChanged.connect(self.verifyCompareT)
+    
+        # StatementGroupings takes in the full list of groups, and returns the list of groups which were selected.
+    
+    def callStatementGroupings(self):
+        groupList = self.dataManager.getAllGroups()
+        if self.sender() == self.TCol1Button:
+            self.g1 = StatementGroupings.callStatementGroupings(groupList)
+            self.updateListPrint(self.TCol1Display, self.g1)
+        elif self.sender() == self.TCol2Button:
+            self.g2 = StatementGroupings.callStatementGroupings(groupList)
+            self.updateListPrint(self.TCol2Display, self.g2)
+        elif self.sender() == self.ZSampleButton:
+            self.g1 = StatementGroupings.callStatementGroupings(groupList)
+            self.updateListPrint(self.ZSampleDisplay, self.g1)
+        elif self.sender() == self.DepGroupButton:
+            self.g1 = StatementGroupings.callStatementGroupings(groupList)
+            self.updateListPrint(self.depGroupDisplay, self.g1)
+        elif self.sender() == self.sqGroupButton:
+            self.g1 = StatementGroupings.callStatementGroupings(groupList)
+            self.updateListPrint(self.sqGroupDisplay, self.g1)
+    
+    def updateListPrint(self, combo, group):
+        groupPrint = self.getGroupListPrint(group)
+        combo.setText(groupPrint)
+        
+    
+    def getGroupListPrint(self, groupList):
+        print groupList
+        printString = ''
+        for group in groupList:
+            printString += group.getName() + ' (' + group.getParentName() + '), '
+        return printString
+    
+    def statementValid(self):
+        if self.testType == Typedef.TTest:
+            return self.colTypes[self.TCompareCombo.currentIndex()] == Typedef.numeric
+        elif self.testType == Typedef.ZTest:
+            return self.colTypes[self.ZCompareCombo.currentIndex()] == Typedef.numeric
+        elif self.testType == Typedef.DepTest:
+            return self.colTypes[self.ZCompareCombo.currentIndex()] == Typedef.numeric
+        else:
+            return True
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(_translate("Form", "Form", None))
@@ -360,13 +494,149 @@ class Ui_Form(object):
         self.sqGroupButton.setText(_translate("Form", "Change", None))
         self.sqStatementLabel.setText(_translate("Form", "Test Statement", None))
 
+    def getTestStatement(self):
+        newStmt = Statement()
+        newStmt.setTestType(self.testType)
+        if self.testType == Typedef.TTest:
+            newStmt.setTTest(self.g1, self.g2, self.TCompareCombo.currentIndex(), self.TERangeCombo.currentIndex())
+        elif self.testType == Typedef.ZTest:
+            if self.ZMeanEdit.text() == '':
+                self.ZMeanEdit.setText('0')
+            if self.ZVarianceEdit.text() == '':
+                self.ZVarianceEdit.setText('0')
+            newStmt.setZTest(self.g1, self.ZCompareCombo.currentIndex(), float(self.ZMeanEdit.text()), float(self.ZVarianceEdit.text()), self.ZERangeCombo.currentIndex())
+        elif self.testType == Typedef.DepTest:
+# Dependent test works.
+            newStmt.setDepTest(self.DepBeforeCombo.currentIndex(), self.DepAfterCombo.currentIndex(), self.g1, self.DepERangeCombo.currentIndex())
+        elif self.testType == Typedef.ChiSqTest:
+# Chi-Square testing in this iteration is limited to testing if the distribution in a single column is equal element-wise.
+# Testing if all elements have an equal chance of occurring.
+            newStmt.setChiSqTest(self.sqColCombo.currentIndex(),self.g1)
+# Write the statement that will be shown in the main window.
+        newStmt.setStmt(self.writeStatement())
+        return newStmt
+    
+    def writeStatement(self):
+        starter = 'I think that '
+        if self.testType == Typedef.TTest:
+            return starter + self.writeTStatement()
+        elif self.testType == Typedef.ZTest:
+            return starter + self.writeZStatement()
+        elif self.testType == Typedef.DepTest:
+            return 'Dependent T-Test'
+        elif self.testType == Typedef.ChiSqTest:
+            return 'Chi-Square Test'
+        else:
+            return starter + 'Something\'s wrong.'
+
+    def writeTStatement(self):
+        statement = ''
+        if len(self.g1) > 0:
+            statement += 'Group ' + self.getGroupListPrint(self.g1) + ' '
+        else:
+            statement += 'the data '
+        if self.TERangeCombo.currentIndex() == Typedef.lessThan:
+            statement += 'has a smaller '
+        elif self.TERangeCombo.currentIndex() == Typedef.greaterThan:
+            statement += 'has a greater '
+        elif self.TERangeCombo.currentIndex() == Typedef.notEqual:
+            statement += 'has a distinctly different '
+        statement += '[' + self.TCompareCombo.currentText() + '] compared to '
+        if len(self.g2) > 0:
+            statement += 'Group ' + self.getGroupListPrint(self.g2) + ' '
+        else:
+            statement += 'the data.'
+        return statement
+
+    def writeZStatement(self):
+        statement = ''
+        if len(self.g1) > 0:
+            statement += 'Group ' + self.getGroupListPrint(self.g1) + '\'s '
+        else:
+            statement += 'the data\'s average '
+        statement += '[' + self.ZCompareCombo.currentText() + '] '
+        if self.ZERangeCombo.currentIndex() == Typedef.lessThan:
+            statement += 'is smaller than '
+        elif self.ZERangeCombo.currentIndex() == Typedef.greaterThan:
+            statement += 'is greater than '
+        elif self.ZERangeCombo.currentIndex() == Typedef.notEqual:
+            statement += 'is not '
+        statement += self.ZMeanEdit.text() + '.'
+        return statement
 
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    Form = QtGui.QWidget()
+    Form = QtGui.QDialog()
     ui = Ui_Form()
     ui.setupUi(Form)
     Form.show()
     sys.exit(app.exec_())
 
+class Statement():
+    
+    def __init__(self):    
+        self.testType = 0
+        self.g1 = []
+        self.g2 = []
+        self.tCol = 0
+        self.ERange = Typedef.notEqual
+        self.stmt = ''
+        self.ZMean = 0
+        self.ZVar = 0
+        self.c1 = 0
+        self.c2 = 0
+
+    def setTestType(self, testType):
+        self.testType = testType
+
+# T-Test.
+
+    def setTTest(self, g1, g2, tCol, ERange):
+        self.g1 = g1
+        self.g2 = g2
+        self.tCol = tCol
+        self.ERange = ERange
+
+    def getTTest(self):
+        return self.g1, self.g2, self.tCol, self.ERange
+
+# Z-Test.
+
+    def setZTest(self, g1, tCol, mean, var, ERange):
+        self.g1 = g1
+        self.tCol = tCol
+        self.ZMean = mean
+        self.ZVar = var
+        self.ERange = ERange
+
+    def getZTest(self):
+        return self.g1, self.tCol, self.ZMean, self.ZVar, self.ERange
+
+# Dependent T-Test. Still have to figure out how to get the column which the group was taken from.
+
+    def setDepTest(self, c1, c2, g1, ERange):
+        self.c1 = c1
+        self.c2 = c2
+        self.g1 = g1
+        self.ERange = ERange
+        
+    def getDepTest(self):
+        return self.c1, self.c2, self.g1, self.ERange
+        
+# Chi-Square Test of independence. The current iteration will take null hypothesis as equal distribution of outcomes.
+# So there is no transfer of distribution-specific data currently.
+        
+    def setChiSqTest(self, c1, g1):
+        self.c1 = c1
+        self.g1 = g1
+
+    def getChiSqTest(self):
+        return self.c1, self.g1
+    
+    def setStmt(self, stmt):
+        self.stmt = stmt
+        
+    def getStmt(self):
+        return self.stmt
+        

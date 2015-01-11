@@ -1,53 +1,81 @@
-# -*- coding: utf-8 -*-
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.spatial as spatial
 
-# Form implementation generated from reading ui file 'test.ui'
-#
-# Created: Fri Oct  3 16:23:49 2014
-#      by: PyQt4 UI code generator 4.11.1
-#
-# WARNING! All changes made in this file will be lost!
+def fmt(x, y):
+    return 'x: {x:0.2f}\ny: {y:0.2f}'.format(x=x, y=y)
 
-from PyQt4 import QtCore, QtGui
+class FollowDotCursor(object):
+    """Display the x,y location of the nearest data point."""
+    def __init__(self, ax, x, y, tolerance=5, formatter=fmt, offsets=(-20, 20)):
+        try:
+            x = np.asarray(x, dtype='float')
+        except (TypeError, ValueError):
+            x = np.asarray(mdates.date2num(x), dtype='float')
+        y = np.asarray(y, dtype='float')
+        self._points = np.column_stack((x, y))
+        self.offsets = offsets
+        self.scale = x.ptp()
+        self.scale = y.ptp() / self.scale if self.scale else 1
+        self.tree = spatial.cKDTree(self.scaled(self._points))
+        self.formatter = formatter
+        self.tolerance = tolerance
+        self.ax = ax
+        self.fig = ax.figure
+        self.ax.xaxis.set_label_position('top')
+        self.dot = ax.scatter(
+            [x.min()], [y.min()], s=130, color='green', alpha=0.7)
+        self.annotation = self.setup_annotation()
+        plt.connect('motion_notify_event', self)
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
+    def scaled(self, points):
+        points = np.asarray(points)
+        return points * (self.scale, 1)
 
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+    def __call__(self, event):
+        ax = self.ax
+        # event.inaxes is always the current axis. If you use twinx, ax could be
+        # a different axis.
+        if event.inaxes == ax:
+            x, y = event.xdata, event.ydata
+        elif event.inaxes is None:
+            return
+        else:
+            inv = ax.transData.inverted()
+            x, y = inv.transform([(event.x, event.y)]).ravel()
+        annotation = self.annotation
+        x, y = self.snap(x, y)
+        annotation.xy = x, y
+        annotation.set_text(self.formatter(x, y))
+        self.dot.set_offsets((x, y))
+        bbox = ax.viewLim
+        event.canvas.draw()
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(400, 300)
-        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
-        self.buttonBox.setGeometry(QtCore.QRect(30, 240, 341, 32))
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+    def setup_annotation(self):
+        """Draw and hide the annotation box."""
+        annotation = self.ax.annotate(
+            '', xy=(0, 0), ha = 'right',
+            xytext = self.offsets, textcoords = 'offset points', va = 'bottom',
+            bbox = dict(
+                boxstyle='round,pad=0.5', fc='yellow', alpha=0.75),
+            arrowprops = dict(
+                arrowstyle='->', connectionstyle='arc3,rad=0'))
+        return annotation
 
-        self.retranslateUi(Dialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+    def snap(self, x, y):
+        """Return the value in self.tree closest to x, y."""
+        dist, idx = self.tree.query(self.scaled((x, y)), k=1, p=1)
+        try:
+            return self._points[idx]
+        except IndexError:
+            # IndexError: index out of bounds
+            return self._points[0]
 
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
+x=[1,2,3,4,5]
+y=[6,7,8,9,10]
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
-
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.scatter(x, y)
+cursor = FollowDotCursor(ax, x, y)
+plt.show()
