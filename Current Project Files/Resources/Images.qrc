@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="Resources">
+    <file>Less Than Sign.png</file>
+    <file>Greater Than Sign.png</file>
+    <file>Greater Than Sign.png</file>
+    <file>Open-icon.png</file>
+    <file>shut_down.png</file>
+  </qresource>
+</RCC>
